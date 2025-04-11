@@ -18,15 +18,16 @@ internal sealed class Mediator(
         CancellationToken cancellationToken)
         where TRequest : IRequest<TResponse>
     {
-        var handlers = serviceProvider.GetServices<IRequestHandler<TRequest, TResponse>>();
-        var behaviors = serviceProvider.GetServices<IPipelineBehavior<TRequest, TResponse>>();
+        using IServiceScope scope = serviceProvider.CreateScope();
+        var handlers = scope.ServiceProvider.GetServices<IRequestHandler<TRequest, TResponse>>();
+        var behaviors = scope.ServiceProvider.GetServices<IPipelineBehavior<TRequest, TResponse>>();
 
         var pipeline = BuildPipeline(handlers, behaviors, cancellationToken);
         return await pipeline(request);
     }
 
     private static Func<TRequest, Task> BuildPipeline<TRequest>(
-            IEnumerable<IRequestHandler<TRequest>> handlers,
+        IEnumerable<IRequestHandler<TRequest>> handlers,
         IEnumerable<IPipelineBehavior<TRequest>> behaviors,
         CancellationToken cancellationToken)
         where TRequest : IRequest
@@ -48,6 +49,7 @@ internal sealed class Mediator(
 
         return handlerDelegate;
     }
+
     private static Func<TRequest, Task<TResponse>> BuildPipeline<TRequest, TResponse>(
         IEnumerable<IRequestHandler<TRequest, TResponse>> handlers,
         IEnumerable<IPipelineBehavior<TRequest, TResponse>> behaviors,

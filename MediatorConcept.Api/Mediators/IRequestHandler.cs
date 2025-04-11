@@ -11,4 +11,3 @@ public interface IRequestHandler<in TRequest, TResponse>
 {
     Task<TResponse> HandlerAsync(TRequest request, CancellationToken cancellationToken = default);
 }
-

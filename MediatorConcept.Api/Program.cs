@@ -16,13 +16,22 @@ builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.TryAddTransient<IRequestHandler<GetSampleRequest>, GetSampleRequestHandler>();
-builder.Services.TryAddTransient<IRequestHandler<GetNameRequest, Result<string>>, GetNameRequestHandler>();
+builder.Services.TryAddScoped<IPipelineBehavior<GetSampleRequest>, RequestLoggingPipelineBehavior<GetSampleRequest>>();
 
-builder.Services.TryAddTransient<IPipelineBehavior<GetSampleRequest>, RequestLoggingPipelineBehavior<GetSampleRequest>>();
-builder.Services.TryAddTransient<IPipelineBehavior<GetNameRequest, Result<string>>, RequestLoggingPipelineBehavior<GetNameRequest, Result<string>>>();
+builder.Services.TryAddScoped<IPipelineBehavior<GetNameRequest, Result<string>>, RequestLoggingPipelineBehavior<GetNameRequest, Result<string>>>();
+builder.Services.TryAddScoped<IPipelineBehavior<GetNameRequest, Result<string>>, ExceptionHandlingPipelineBehavior<GetNameRequest, Result<string>>>();
+//builder.Services.TryAddScoped<IPipelineBehavior<GetNameRequest, Result<string>>>(sp =>
+//{
+//    var loggingBehavior = sp.GetRequiredService<RequestLoggingPipelineBehavior<GetNameRequest, Result<string>>>();
+//    var exceptionHandlingBehavior = sp.GetRequiredService<ExceptionHandlingPipelineBehavior<GetNameRequest, Result<string>>>();
 
-builder.Services.TryAddSingleton<Mediator>();
+//    return new PipelineBehaviorDecorator<GetNameRequest, Result<string>>(exceptionHandlingBehavior, loggingBehavior);
+//});
+
+builder.Services.TryAddScoped<IRequestHandler<GetSampleRequest>, GetSampleRequestHandler>();
+builder.Services.TryAddScoped<IRequestHandler<GetNameRequest, Result<string>>, GetNameRequestHandler>();
+
+builder.Services.TryAddScoped<Mediator>();
 
 var app = builder.Build();
 
