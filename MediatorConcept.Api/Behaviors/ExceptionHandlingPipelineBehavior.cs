@@ -5,10 +5,11 @@ namespace MediatorConcept.Api.Behaviors;
 
 internal sealed class ExceptionHandlingPipelineBehavior<TRequest, TResponse>(
     ILogger<ExceptionHandlingPipelineBehavior<TRequest, TResponse>> logger)
-    : IPipelineBehavior<TRequest, TResponse>
+    : PipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
+    where TResponse : class
 {
-    public async Task<TResponse> ProcessAsync(
+    public override async Task<TResponse> ProcessAsync(
         TRequest request,
         Func<Task<TResponse>> next,
         CancellationToken cancellationToken)
