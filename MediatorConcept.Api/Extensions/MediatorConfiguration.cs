@@ -31,16 +31,6 @@ public static class MediatorConfiguration
                 .MakeGenericType(pipelineRequest);
 
             services.Decorate(pipeline, closedDecorator);
-
-            //services.TryAddScoped(typeForDecoratorRequest);
-            //services.TryAddScoped(
-            //    pipeline.MakeGenericType(pipelineRequest), sp =>
-            //    {
-            //        var decorated = sp.GetRequiredService(typeForDecoratorRequest);
-            //        return Activator.CreateInstance(
-            //            pipeline,
-            //            decorated)!;
-            //    });
         }
 
         return services;
