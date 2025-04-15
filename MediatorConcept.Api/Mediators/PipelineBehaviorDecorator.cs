@@ -1,15 +1,18 @@
-﻿
-namespace MediatorConcept.Api.Mediators;
+﻿namespace MediatorConcept.Api.Mediators;
 
-internal sealed class PipelineBehaviorDecorator<TRequest, TResponse>(
-    IPipelineBehavior<TRequest, TResponse> decorated)
-    : PipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
-    where TResponse : class
+internal sealed class PipelineBehaviorDecorator<TRequest>(
+    IPipelineBehavior<TRequest> decorated)
+    : PipelineBehavior<TRequest>
+    where TRequest : IBaseRequest
 {
-    public override Task<TResponse> ProcessAsync(
-        TRequest request, Func<Task<TResponse>> next, CancellationToken cancellationToken = default)
+    public override async Task<TResponse> ProcessAsync<TResponse>(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await decorated.ProcessAsync(
+            request,
+            next,
+            cancellationToken);
     }
 }

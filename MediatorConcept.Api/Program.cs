@@ -1,5 +1,5 @@
+using MediatorConcept.Api;
 using MediatorConcept.Api.ApiResults;
-using MediatorConcept.Api.Behaviors;
 using MediatorConcept.Api.Domain;
 using MediatorConcept.Api.Extensions;
 using MediatorConcept.Api.Mediators;
@@ -15,15 +15,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.TryAddScoped<IPipelineBehavior<GetNameRequest, Result<string>>, ExceptionHandlingPipelineBehavior<GetNameRequest, Result<string>>>();
-builder.Services.TryAddScoped<IPipelineBehavior<GetNameRequest, Result<string>>, RequestLoggingPipelineBehavior<GetNameRequest, Result<string>>>();
-//builder.Services.TryAddScoped<IPipelineBehavior<GetNameRequest, Result<string>>>(sp =>
-//{
-//    var loggingBehavior = sp.GetRequiredService<RequestLoggingPipelineBehavior<GetNameRequest, Result<string>>>();
-//    var exceptionHandlingBehavior = sp.GetRequiredService<ExceptionHandlingPipelineBehavior<GetNameRequest, Result<string>>>();
-
-//    return new PipelineBehaviorDecorator<GetNameRequest, Result<string>>(exceptionHandlingBehavior, loggingBehavior);
-//});
+builder.Services.AddPipelineBehaviors(AssemblyReference.Assembly);
 
 builder.Services.TryAddScoped<IRequestHandler<GetNameRequest, Result<string>>, GetNameRequestHandler>();
 

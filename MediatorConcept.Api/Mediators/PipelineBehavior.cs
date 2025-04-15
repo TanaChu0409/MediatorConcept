@@ -1,17 +1,17 @@
 ﻿namespace MediatorConcept.Api.Mediators;
 
-public abstract class PipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
-    where TResponse : class
+public abstract class PipelineBehavior<TRequest>
+    : IPipelineBehavior<TRequest>
+    where TRequest : IBaseRequest
 {
-    public abstract Task<TResponse> ProcessAsync(
+    public abstract Task<TResponse> ProcessAsync<TResponse>(
         TRequest request,
-        Func<Task<TResponse>> next,
+        RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken = default);
 
-    public Task<TResponse> ProcessAsync(
+    public Task<TResponse> ProcessAsync<TResponse>(
         IRequest<TResponse> request,
-        Func<Task<TResponse>> next,
+        RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken = default)
     {
         return ProcessAsync((TRequest)request, next, cancellationToken);

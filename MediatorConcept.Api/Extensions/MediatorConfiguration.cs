@@ -1,19 +1,48 @@
-﻿namespace MediatorConcept.Api.Extensions;
+﻿using System.Reflection;
+using MediatorConcept.Api.Mediators;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
-public sealed class MediatorConfiguration
+namespace MediatorConcept.Api.Extensions;
+public static class MediatorConfiguration
 {
-    private readonly Dictionary<Type, List<object>> _services = [];
-
-    public void Register<TService>(TService implementation)
+    public static IServiceCollection AddPipelineBehaviors(
+        this IServiceCollection services,
+        Assembly assembly)
     {
-        var type = typeof(TService);
-        if (_services.TryGetValue(type, out List<object>? value))
+        Type[] pipelines = assembly
+            .GetTypes()
+            .Where(t =>
+                t.IsAssignableTo(typeof(IPipelineBehavior)) &&
+                !t.IsInterface &&
+                !t.IsAbstract)
+            .ToArray();
+
+        foreach (Type pipeline in pipelines)
         {
-            _services[type] = value;
+            services.TryAddScoped(pipeline);
+
+            Type pipelineRequest = pipeline
+                .GetInterfaces()
+                .Single(i => i.IsGenericType)
+                .GetGenericArguments()
+                .Single();
+
+            Type closedDecorator = typeof(PipelineBehaviorDecorator<>)
+                .MakeGenericType(pipelineRequest);
+
+            services.Decorate(pipeline, closedDecorator);
+
+            //services.TryAddScoped(typeForDecoratorRequest);
+            //services.TryAddScoped(
+            //    pipeline.MakeGenericType(pipelineRequest), sp =>
+            //    {
+            //        var decorated = sp.GetRequiredService(typeForDecoratorRequest);
+            //        return Activator.CreateInstance(
+            //            pipeline,
+            //            decorated)!;
+            //    });
         }
-        else
-        {
-            value = ([]);
-        }
+
+        return services;
     }
 }

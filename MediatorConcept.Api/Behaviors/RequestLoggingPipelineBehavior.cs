@@ -3,15 +3,14 @@ using MediatorConcept.Api.Mediators;
 
 namespace MediatorConcept.Api.Behaviors;
 
-public sealed class RequestLoggingPipelineBehavior<TRequest, TResponse>(
-    ILogger<RequestLoggingPipelineBehavior<TRequest, TResponse>> logger)
-    : PipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
-    where TResponse : class
+public sealed class RequestLoggingPipelineBehavior<TRequest>(
+    ILogger<RequestLoggingPipelineBehavior<TRequest>> logger)
+    : PipelineBehavior<TRequest>
+    where TRequest : IBaseRequest
 {
-    public override async Task<TResponse> ProcessAsync(
+    public override async Task<TResponse> ProcessAsync<TResponse>(
         TRequest request,
-        Func<Task<TResponse>> next,
+        RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
         string requestName = typeof(TRequest).Name;

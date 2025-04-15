@@ -11,14 +11,14 @@ internal sealed class Mediator(
     {
         using IServiceScope scope = serviceProvider.CreateScope();
         var handlers = scope.ServiceProvider.GetServices<IRequestHandler<TRequest, TResponse>>();
-        var behaviors = scope.ServiceProvider.GetServices<IPipelineBehavior<TRequest, TResponse>>();
+        var behaviors = scope.ServiceProvider.GetServices<IPipelineBehavior>();
 
         var pipeline = BuildPipeline(handlers, behaviors, cancellationToken);
         return await pipeline(request);
     }
     private static Func<TRequest, Task<TResponse>> BuildPipeline<TRequest, TResponse>(
         IEnumerable<IRequestHandler<TRequest, TResponse>> handlers,
-        IEnumerable<IPipelineBehavior<TRequest, TResponse>> behaviors,
+        IEnumerable<IPipelineBehavior> behaviors,
         CancellationToken cancellationToken)
         where TRequest : IRequest<TResponse>
         where TResponse : class
